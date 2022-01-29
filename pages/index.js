@@ -47,7 +47,8 @@ function Titulo(props) {
 }
 
 export default function PaginaInicial() {
-  const username = "vagnerbatista";
+
+  const username = "Vagner Batista";
 
   return (
     <>
@@ -55,98 +56,113 @@ export default function PaginaInicial() {
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backgroundColor: appConfig.theme.colors.primary[900],
-          backgroundImage: 'url(https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2071&q=80)',
+          backgroundColor: appConfig.theme.colors.primary[100],
+          backgroundImage: 'url(https://icdn.digitaltrends.com/image/digitaltrends/text-message-phone-lifestyle-feature.jpg)',
           backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
         }}
       >
         <Box
-          styleSheet={{
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'space-between', 
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            Height : '40%', minHeight : '400px',
-            width: '100%', maxWidth: '350px',
-            borderRadius: '10px', padding: '20px', margin: '20px',
-            border: '1px solid',
-            borderColor: appConfig.theme.colors.primary[400],
-            boxShadow: '0 20px 10px 0 rgb(0 0 0 / 20%)',
-            opacity: '97%',
-            backgroundColor: appConfig.theme.colors.neutrals[800]
-          }}
+        styleSheet={{
+          display: 'flex',
+          position: 'relative',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          Height: '40%', minHeight: '550px',
+              width: '100%', maxWidth: '380px',
+              borderRadius: '10px', padding: '0px', margin: '0px',
+              boxShadow: '0 20px 10px 0 rgb(0 0 0 / 20%)',
+              opacity: '97%', paddingTop: '120px',
+              backgroundColor: appConfig.theme.colors.neutrals[900]
+        }}
         >
-          {/* Formulário */}
           <Box
-            as="form"
             styleSheet={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              width: { xs: '100%', sm: '100%' }, textAlign: 'center', marginBottom: '10px', marginTop : '67px'
+              display: 'flex',
+              position: 'relative',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexDirection: {
+                xs: 'column',
+                sm: 'row',
+              },
+              Height: '40%', minHeight: '350px',
+              width: '100%', maxWidth: '450px',
+              borderRadius: '50px', padding: '20px', margin: '20px',
+              border: '0px solid',
+              borderColor: appConfig.theme.colors.primary[900],
+              boxShadow: '0 20px 10px 0 rgb(0 0 0 / 20%)',
+              opacity: '92%',
+              backgroundColor: appConfig.theme.colors.neutrals[600]
             }}
           >
-            {/* Photo Area */}
+            {/* Formulário */}
             <Box
+              as="form"
               styleSheet={{
-                top: '-90px',
-                position: 'absolute',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                maxWidth: '170px',
-                padding: '5px',
-                backgroundColor: appConfig.theme.colors.neutrals[900],
-                border: '1px solid',
-                borderColor: appConfig.theme.colors.primary[400],
-                borderRadius: '50%',
-                flex: 1,
-                minHeight: '170px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                width: { xs: '100%', sm: '100%' }, textAlign: 'center', marginBottom: '10px', marginTop: '67px'
               }}
             >
-              <Image
+              {/* Photo Area */}
+              <Box
                 styleSheet={{
-                  borderRadius: '50%'
+                  top: '-110px',
+                  position: 'absolute',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  maxWidth: '170px',
+                  padding: '10px',
+                  backgroundColor: appConfig.theme.colors.neutrals[900],
+                  border: '0px solid',
+                  borderColor: appConfig.theme.colors.primary[900],
+                  borderRadius: '50%',
+                  flex: 1,
+                  minHeight: '170px',
                 }}
-                src={`https://github.com/${username}.png`}
-              />
-            </Box>
-            {/* Photo Area */}           
-              <Text style={{padding: '20px'}}>
-                  <Titulo tag="h3" cor={appConfig.theme.colors.primary[600]}> {username},</Titulo>
-                  <Titulo tag="h2"> bem vindo de volta!</Titulo>
+              >
+                <Image
+                  styleSheet={{
+                    borderRadius: '50%'
+                  }}
+                  src={`https://github.com/${username.toLocaleLowerCase().replace(" ", "")}.png`}
+                />
+              </Box>
+              {/* Photo Area */}
+              <Text style={{ padding: '15px' }}>
+                <Titulo tag="h3" cor={appConfig.theme.colors.primary[600]}> {username},</Titulo>
+                <Titulo tag="h2"> bem vindo de volta!</Titulo>
               </Text>
-              
-            <TextField
-              fullWidth
-              textFieldColors={{
-                neutral: {
-                  textColor: appConfig.theme.colors.neutrals[200],
-                  mainColor: appConfig.theme.colors.neutrals[100],
-                  mainColorHighlight: appConfig.theme.colors.primary[600],
-                  backgroundColor: appConfig.theme.colors.neutrals[800],
-                }               
-              }}
-            />
-            <Button
-              type='submit'
-              label='Vamos lá!'
-              fullWidth
-              buttonColors={{
-                contrastColor: appConfig.theme.colors.neutrals[999],
-                mainColor: appConfig.theme.colors.primary[500],
-                mainColorLight: appConfig.theme.colors.primary[400],
-                mainColorStrong: appConfig.theme.colors.primary[600]
-              }} 
-            />
-            <Text variant="body3" styleSheet={{ marginTop: '47px', color: appConfig.theme.colors.neutrals["000"] }}>
-              {appConfig.name}
-            </Text>
+
+              <TextField
+                fullWidth
+                textFieldColors={{
+                  neutral: {
+                    textColor: appConfig.theme.colors.neutrals[200],
+                    mainColor: appConfig.theme.colors.neutrals[100],
+                    mainColorHighlight: appConfig.theme.colors.primary[600],
+                    backgroundColor: appConfig.theme.colors.neutrals[800],
+                  }
+                }}
+              />
+              <Button
+                type='submit'
+                label='Vamos lá!'
+                fullWidth
+                buttonColors={{
+                  contrastColor: appConfig.theme.colors.neutrals[999],
+                  mainColor: appConfig.theme.colors.primary[500],
+                  mainColorLight: appConfig.theme.colors.primary[400],
+                  mainColorStrong: appConfig.theme.colors.primary[600]
+                }}
+              />
+              <Text variant="body3" styleSheet={{ marginTop: '35px', color: appConfig.theme.colors.neutrals["000"] }}>
+                {appConfig.name}
+              </Text>
+            </Box>
+            {/* Formulário */}
           </Box>
-          {/* Formulário */}
-        </Box> 
+        </Box>
       </Box>
     </>
   );
