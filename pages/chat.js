@@ -44,8 +44,8 @@ export default function ChatPage() {
                     boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
                     borderRadius: '10px',
                     backgroundColor: appConfig.theme.colors.neutrals[700],
-                    height: '70%',
-                    maxWidth: '80%',
+                    height: '95%',
+                    maxWidth: '98%',
                     maxHeight: '95vh',
                     padding: '10px',
                 }}
@@ -115,17 +115,17 @@ export default function ChatPage() {
                             }}
 
                             placeholder="Insira sua mensagem aqui"
-                            type="text"
+                            type="textarea"
                             styleSheet={{
                                 width: '100%',
                                 height: '50px',
                                 border: '0px',
                                 resize: 'none',
                                 borderRadius: '30px ',
-                                padding: '6px 70px',
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
+                                padding: '4px 40px 4px 40px',
                                 marginRight: '10px',
-                                marginLeft: '10px',
+                                marginLeft: '40px',
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
@@ -194,7 +194,10 @@ function MessageList(props) {
                             key={mensagem.id}
                             tag="li"
                             styleSheet={{
-                                borderRadius: '5px',
+                                position: 'relative',
+                                left: '17%',
+                                width: '80%',
+                                borderRadius: '10px',
                                 marginRight: '7px',
                                 padding: '7px',
                                 textAlign: 'right',
@@ -212,10 +215,10 @@ function MessageList(props) {
                             >
                                 <Text
                                     styleSheet={{
-                                        fontSize: '10px',
-                                        marginTop: '7px',
-                                        marginRight: '7px',
-                                        color: appConfig.theme.colors.neutrals[900],
+                                        fontSize: '12px',
+                                        marginTop: '5px',
+                                        marginRight: '5px',
+                                        color: appConfig.theme.colors.primary[600],
                                     }}
                                     tag="span"
                                 >
@@ -233,7 +236,7 @@ function MessageList(props) {
                             </Box>
                             <Text
                                 styleSheet={{
-                                    fontSize: '19px',
+                                    fontSize: '17px',
                                     marginRight: '8px',
                                     color: appConfig.theme.colors.neutrals['000'],
                                 }}>
