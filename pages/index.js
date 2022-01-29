@@ -1,34 +1,7 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import React from 'react';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  );
-}
 
 function Titulo(props) {
   const Tag = props.tag || 'h1';
@@ -47,12 +20,11 @@ function Titulo(props) {
 }
 
 export default function PaginaInicial() {
-
-  const username = "Vagner Batista";
-
+  const [username, setUserName] = React.useState('vagnerbatista');
+  const [valorMin, setUsermin] = React.useState(false);
+  const roteamento = useRouter();
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -98,6 +70,10 @@ export default function PaginaInicial() {
             {/* Formulário */}
             <Box
               as="form"
+              onSubmit={ function (event) {
+                event.preventDefault();
+                roteamento.push('/chat');
+              }}
               styleSheet={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 width: { xs: '100%', sm: '100%' }, textAlign: 'center', marginBottom: '10px', marginTop: '67px'
@@ -125,16 +101,27 @@ export default function PaginaInicial() {
                   styleSheet={{
                     borderRadius: '50%'
                   }}
-                  src={`https://github.com/${username.toLocaleLowerCase().replace(" ", "")}.png`}
+                  src={ valorMin != true ? `https://github.com/${username.toLocaleLowerCase().replace(" ", "")}.png`:
+                   `https://www.inovegas.com.br/site/wp-content/uploads/2017/08/sem-foto.jpg` }
                 />
               </Box>
               {/* Photo Area */}
               <Text style={{ padding: '15px' }}>
-                <Titulo tag="h3" cor={appConfig.theme.colors.primary[600]}> {username},</Titulo>
-                <Titulo tag="h2"> bem vindo de volta!</Titulo>
+                <Titulo tag="h3" cor={appConfig.theme.colors.primary[600]}> { valorMin != true ? username+"," : "Vamos começar?"}</Titulo>
+                <Titulo tag="h2"> { valorMin != true ? "bem vindo de volta!" : "digite seu usuário."} </Titulo>
               </Text>
 
-              <TextField
+              <TextField value = {username.toLocaleLowerCase().replace(" ", "")}
+                onChange={function (event){
+                  //Onde está o valor?
+                  setUsermin(event.target.value.length < 3 ? true : false)
+                  console.log(valorMin);
+                  //Trocar o valor da variavel
+                  //Através do React e avise quem precisa
+                  const valor = event.target.value;
+                  console.log(valor);
+                  setUserName(valor);
+                }}
                 fullWidth
                 textFieldColors={{
                   neutral: {
@@ -148,6 +135,7 @@ export default function PaginaInicial() {
               <Button
                 type='submit'
                 label='Vamos lá!'
+                disabled = {valorMin}
                 fullWidth
                 buttonColors={{
                   contrastColor: appConfig.theme.colors.neutrals[999],
