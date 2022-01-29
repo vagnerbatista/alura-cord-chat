@@ -1,4 +1,5 @@
-# Logs
+node_modules
+.next# Logs
 logs
 *.log
 npm-debug.log*
@@ -39,9 +40,7 @@ bower_components
 build/Release
 
 # Dependency directories
-.next
 node_modules
-node_modules/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
