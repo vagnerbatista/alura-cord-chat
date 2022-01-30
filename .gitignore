@@ -101,6 +101,9 @@ dist
 # vuepress build output
 .vuepress/dist
 
+#Secrect api Keys
+.env
+
 # vuepress v2.x temp and cache directory
 .temp
 .cache

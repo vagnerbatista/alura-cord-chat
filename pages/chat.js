@@ -1,28 +1,65 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import react from 'react';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/router';
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker'
+
+const supabaseClient = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
 
+    function escutaMensagensEmTempoReal(adicionaMensagem) {
+        return supabaseClient
+            .from('mensagens')
+            .on('INSERT', (respostaLive) => {
+                adicionaMensagem(respostaLive.new)
+            })
+            .subscribe();
+    }
+
+    React.useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+                console.log(data);
+                setListaDeMensagens(data)
+            });
+        escutaMensagensEmTempoReal((novaMensagem) => {
+            setListaDeMensagens((valorAtualDaLista) =>{
+                return [
+                    novaMensagem,
+                    ...valorAtualDaLista
+                ]
+            });
+        });
+    }, [])
+
+
     function handleNovaMensagem(novaMensagem) {
         if (novaMensagem != "") {
-
-
             const data = new Date;
             const mensagem = {
-                id: listaDeMensagens.length + 1,
-                de: 'vagnerbatista',
+                de: usuarioLogado,
+                para: 'vagnerbatista',
                 texto: novaMensagem,
                 data: `${data.getDay().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear()}`,
                 hora: `${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`
-            }
-            setListaDeMensagens([
-                mensagem,
-                ...listaDeMensagens
-            ]);
+            };
+
+            supabaseClient
+                .from('mensagens')
+                .insert(
+                    mensagem
+                )
+                .then(() => {});
+
             setMensagem('');
         }
     }
@@ -63,7 +100,7 @@ export default function ChatPage() {
                         padding: '10px',
                     }}
                 >
-                    <MessageList mensagens={listaDeMensagens} />
+                    <MessageList mensagens={listaDeMensagens || ""} />
                     <Box
                         as="form"
                         styleSheet={{
@@ -74,30 +111,30 @@ export default function ChatPage() {
                         }}
                     >
                         <Box
-                        styleSheet={{
-                            width: '66px',
-                            height: '66px',
-                            left: '5px',
-                            top: '-8px',
-                            borderRadius: '50%',
-                            position: 'absolute', 
-                            backgroundColor: appConfig.theme.colors.neutrals[800],
-                            justifyContent: 'center'
-                        }}
-                        >
-                        <Image
                             styleSheet={{
-                                width: '55px',
-                                height: '55px',
-                                top: '6px',
-                                left: '5.5px',
-                                position: 'absolute',
+                                width: '66px',
+                                height: '66px',
+                                left: '6px',
+                                top: '-9px',
                                 borderRadius: '50%',
-                                border: '20px',
-                                borderColor: appConfig.theme.colors.primary[600],
+                                position: 'absolute',
+                                backgroundColor: appConfig.theme.colors.neutrals[800],
+                                justifyContent: 'center'
                             }}
-                            src={`https://github.com/vagnerbatista.png`}
-                        />
+                        >
+                            <Image
+                                styleSheet={{
+                                    width: '55px',
+                                    height: '55px',
+                                    top: '6px',
+                                    left: '5.5px',
+                                    position: 'absolute',
+                                    borderRadius: '50%',
+                                    border: '20px',
+                                    borderColor: appConfig.theme.colors.primary[600],
+                                }}
+                                src={`https://github.com/vagnerbatista.png`}
+                            />
                         </Box>
                         <TextField
                             value={mensagem}
@@ -129,6 +166,10 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker onStickerClick={(sticker) => {
+                            handleNovaMensagem(`:sticker: ${sticker}`)
+
+                        }} />
                         <Box styleSheet={{
                             marginRight: '5px'
                         }}>
@@ -184,6 +225,7 @@ function MessageList(props) {
                 flex: 2,
                 color: appConfig.theme.colors.neutrals["000"],
                 marginBottom: '16px',
+                alignItems: 'end',
                 margin: '5px'
             }}
         >
@@ -193,18 +235,20 @@ function MessageList(props) {
                         <Text
                             key={mensagem.id}
                             tag="li"
+
+                            onKeyPress={(event) => {
+                                console.log(event);
+                            }}
                             styleSheet={{
-                                position: 'relative',
-                                left: '17%',
-                                width: '80%',
                                 borderRadius: '10px',
-                                marginRight: '7px',
+                                marginRight: '30px',
                                 padding: '7px',
                                 textAlign: 'right',
+                                marginTop: '10px',
                                 marginBottom: '15px',
-                                backgroundColor: appConfig.theme.colors.primary[900],
+                                backgroundColor: appConfig.theme.colors.neutrals[800],
                                 hover: {
-                                    backgroundColor: appConfig.theme.colors.neutrals[300],
+                                    backgroundColor: appConfig.theme.colors.neutrals[800],
                                 }
                             }}
                         >
@@ -213,17 +257,26 @@ function MessageList(props) {
                                     marginBottom: '8px'
                                 }}
                             >
-                                <Text
-                                    styleSheet={{
-                                        fontSize: '12px',
-                                        marginTop: '5px',
-                                        marginRight: '5px',
-                                        color: appConfig.theme.colors.primary[600],
+                                <Button
+                                    variant='secondary'
+                                    colorVariant='dark'
+                                    iconName='trash'
+                                    label='Apagar'
+                                    rounded='md'
+                                    size='xs'
+                                    onClick={(event) => {
+                                        const result = confirm('Deseja apagar a mensagem?')
+                                        if (result === true) {
+                                            supabaseClient
+                                            .from('mensagens')
+                                            .delete(mensagem)
+                                            .match({ id: `${mensagem.id}` })
+                                            .then(() => {
+                                            })
+                                        }
+                                        
                                     }}
-                                    tag="span"
-                                >
-                                    {mensagem.data} {mensagem.hora}
-                                </Text>
+                                />
                                 <Text
                                     styleSheet={{
                                         fontSize: '15px',
@@ -237,10 +290,34 @@ function MessageList(props) {
                             <Text
                                 styleSheet={{
                                     fontSize: '17px',
-                                    marginRight: '8px',
+                                    marginRight: '10px',
+                                    marginBottom: '5px',
                                     color: appConfig.theme.colors.neutrals['000'],
                                 }}>
-                                {mensagem.texto}
+                                {mensagem.texto.startsWith(':sticker:')
+                                    ? (
+                                        <Image styleSheet={{
+                                            maxWidth: '200px',
+                                            maxHeight: '200px'
+                                        }}
+                                            src={mensagem.texto.replace(':sticker:', '')}></Image>
+                                    )
+                                    : (
+                                        mensagem.texto
+                                    )}
+                            </Text>
+                            <Text
+                                styleSheet={{
+                                    position: 'relative',
+                                    top: '25px',
+                                    fontSize: '12px',
+                                    marginTop: '-16px',
+                                    marginRight: '-16px',
+                                    color: appConfig.theme.colors.primary[600],
+                                }}
+                                tag="span"
+                            >
+                                {mensagem.data} {mensagem.hora}
                             </Text>
                         </Text>
                     )
