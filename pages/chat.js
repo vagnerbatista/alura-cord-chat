@@ -1,11 +1,10 @@
+import { useState } from 'react'
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
-import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/router';
 import { ButtonSendSticker } from '../src/components/ButtonSendSticker'
-
-const supabaseClient = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY);
+import { supabase } from '../src/supabaseClient'
 
 export default function ChatPage() {
     const roteamento = useRouter();
@@ -13,17 +12,32 @@ export default function ChatPage() {
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
 
-    function escutaMensagensEmTempoReal(adicionaMensagem) {
-        return supabaseClient
+     function escutaMensagensEmTempoReal(adicionaMensagem) {
+        return supabase
             .from('mensagens')
-            .on('INSERT', (respostaLive) => {
-                adicionaMensagem(respostaLive.new)
+            .on('INSERT', (respostaLiveInsert) => {
+                setListaDeMensagens((valorAtualDaLista) =>{
+                    return [
+                        respostaLiveInsert.new,
+                        ...valorAtualDaLista
+                    ]
+                });
+            }).on('UPDATE', (respostaLiveUpdate) => {
+                setListaDeMensagens((valorAtualDaListaMensagens) =>
+                valorAtualDaListaMensagens.map((mensagem) =>
+                mensagem.id === respostaLiveUpdate.old.id ? 
+                 ({
+                    ...mensagem,
+                    texto: respostaLiveUpdate.new.texto,
+                    data: respostaLiveUpdate.new.data,
+                    hora: respostaLiveUpdate.new.hora
+                    }) : (mensagem)));
             })
             .subscribe();
     }
 
     React.useEffect(() => {
-        supabaseClient
+         supabase
             .from('mensagens')
             .select('*')
             .order('id', { ascending: false })
@@ -31,21 +45,13 @@ export default function ChatPage() {
                 console.log(data);
                 setListaDeMensagens(data)
             });
-        escutaMensagensEmTempoReal((novaMensagem) => {
-            setListaDeMensagens((valorAtualDaLista) =>{
-                return [
-                    novaMensagem,
-                    ...valorAtualDaLista
-                ]
-            });
-        });
+        escutaMensagensEmTempoReal(() => {});
     }, [])
 
-
-    function handleNovaMensagem(novaMensagem) {
+     function handleNovaMensagem(novaMensagem) {
         if (novaMensagem != "") {
-            const data = new Date;
-            const mensagem = {
+            let data = new Date;
+            let mensagem = {
                 de: usuarioLogado,
                 para: 'vagnerbatista',
                 texto: novaMensagem,
@@ -53,7 +59,7 @@ export default function ChatPage() {
                 hora: `${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`
             };
 
-            supabaseClient
+            supabase
                 .from('mensagens')
                 .insert(
                     mensagem
@@ -100,7 +106,7 @@ export default function ChatPage() {
                         padding: '10px',
                     }}
                 >
-                    <MessageList mensagens={listaDeMensagens || ""} />
+                    <MessageList mensagens={listaDeMensagens} />
                     <Box
                         as="form"
                         styleSheet={{
@@ -219,7 +225,7 @@ function MessageList(props) {
         <Box
             tag="ul"
             styleSheet={{
-                overflowY: 'scroll',
+                overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column-reverse',
                 flex: 2,
@@ -257,7 +263,8 @@ function MessageList(props) {
                                     marginBottom: '8px'
                                 }}
                             >
-                                <Button
+                                {mensagem.texto !== 'Mensagem apagada' && (
+                                    <Button
                                     variant='secondary'
                                     colorVariant='dark'
                                     iconName='trash'
@@ -267,32 +274,29 @@ function MessageList(props) {
                                     onClick={(event) => {
                                         const result = confirm('Deseja apagar a mensagem?')
                                         if (result === true) {
-                                            supabaseClient
+                                            let data = new Date;
+                                            supabase
                                             .from('mensagens')
-                                            .delete(mensagem)
-                                            .match({ id: `${mensagem.id}` })
-                                            .then(() => {
+                                            .update({
+                                                texto: 'Mensagem apagada',
+                                                data: `${data.getDay().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear()}`,
+                                                hora: `${data.getHours().toString().padStart(2, '0')}:${data.getMinutes().toString().padStart(2, '0')}`
                                             })
-                                        }
-                                        
+                                            .match({ id: mensagem.id })
+                                            .then()
+                                        }                
                                     }}
                                 />
-                                <Text
-                                    styleSheet={{
-                                        fontSize: '15px',
-                                        marginLeft: '8px',
-                                        color: appConfig.theme.colors.neutrals[900]
-                                    }}
-                                    tag="strong">
-                                    {/*mensagem.de*/}
-                                </Text>
+                                )}
                             </Box>
+                            
                             <Text
                                 styleSheet={{
-                                    fontSize: '17px',
-                                    marginRight: '10px',
-                                    marginBottom: '5px',
-                                    color: appConfig.theme.colors.neutrals['000'],
+                                    fontSize: mensagem.texto !== 'Mensagem apagada' ? '17px': '12px',
+                                    marginRight: '5px',
+                                    marginBottom: '8px',
+                                    color: mensagem.texto !== 'Mensagem apagada' ?
+                                     appConfig.theme.colors.neutrals['000'] : appConfig.theme.colors.neutrals[400],
                                 }}>
                                 {mensagem.texto.startsWith(':sticker:')
                                     ? (

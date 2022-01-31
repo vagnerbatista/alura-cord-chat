@@ -27,7 +27,6 @@ function GlobalStyle() {
       `}</style>
     );
   }
-
 export default function CustomApp({Component, pageProps}){
     return(
         <>
